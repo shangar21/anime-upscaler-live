@@ -25,15 +25,13 @@ https://github.com/user-attachments/assets/9c983ae0-6e14-4ec8-93cc-3d9f13eef664
 │   ├── quant.py              # TRT engine builder + ORT/TRT benchmark suite
 │   └── trt_engines/          # Built .trt engine files (not checked in)
 │
-├── plugin/
+├── player/
 │   ├── customlib_impl.cpp    # nvdsvideotemplate custom library (the DeepStream plugin)
 │   ├── sr_trt_engine.hpp/cpp # TRT engine loader with runtime scale detection
 │   ├── sr_pipeline.hpp/cpp   # Per-frame tiling + cosine-blend pipeline
 │   ├── tile_kernels.cuh/cu   # Batch tile extraction + stitch CUDA kernels
 │   ├── pack_rgba_kernel.cuh/cu  # RGB planes → RGBA interleave kernel
 │   └── Makefile              # Builds libcustom_videoimpl.so
-│
-├── player/
 │   └── player.py             # GTK GUI: file picker, seek bar, audio, upscaled playback
 │
 ├── .gitignore
