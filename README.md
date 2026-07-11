@@ -8,8 +8,7 @@ Tested on Ubuntu 24.04 with an RTX 3080 (12GB). Runs at 65-80 FPS on 720×480 an
 
 ## Demo
 
-![](player/demos/gintama_demo.mp4)
-
+<video src="[https://github.com](https://github.com/user-attachments/assets/1629034e-7eb7-480f-904a-f31aa8d373a9)" controls width="600"></video>
 
 ## Project structure
 
