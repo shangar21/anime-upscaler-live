@@ -1,0 +1,104 @@
+&&&& RUNNING TensorRT.trtexec [TensorRT v110100] [b106] # /bin/trtexec --loadEngine=model/trt_engines/apisr_fp16.trt --verbose
+[06/18/2026-21:18:55] [I] === Model Options ===
+[06/18/2026-21:18:55] [I] Format: *
+[06/18/2026-21:18:55] [I] Model: 
+[06/18/2026-21:18:55] [I] Output:
+[06/18/2026-21:18:55] [I] 
+[06/18/2026-21:18:55] [I] === System Options ===
+[06/18/2026-21:18:55] [I] Device: 0
+[06/18/2026-21:18:55] [I] DLACore: 
+[06/18/2026-21:18:55] [I] Loaded static plugins:
+[06/18/2026-21:18:55] [I] setPluginsToSerialize:
+[06/18/2026-21:18:55] [I] dynamicPlugins:
+[06/18/2026-21:18:55] [I] ignoreParsedPluginLibs: 0
+[06/18/2026-21:18:55] [I] 
+[06/18/2026-21:18:55] [I] === Inference Options ===
+[06/18/2026-21:18:55] [I] Batch: Explicit
+[06/18/2026-21:18:55] [I] Input inference shapes: model
+[06/18/2026-21:18:55] [I] Iterations: 10
+[06/18/2026-21:18:55] [I] Duration: 3s (+ 200ms warm up)
+[06/18/2026-21:18:55] [I] Sleep time: 0ms
+[06/18/2026-21:18:55] [I] Idle time: 0ms
+[06/18/2026-21:18:55] [I] Inference Streams: 1
+[06/18/2026-21:18:55] [I] ExposeDMA: Disabled
+[06/18/2026-21:18:55] [I] Data transfers: Disabled
+[06/18/2026-21:18:55] [I] Spin-wait: Enabled
+[06/18/2026-21:18:55] [I] Multithreading: Disabled
+[06/18/2026-21:18:55] [I] CUDA Graph: Enabled
+[06/18/2026-21:18:55] [I] Time Deserialize: Disabled
+[06/18/2026-21:18:55] [I] Time Refit: Disabled
+[06/18/2026-21:18:55] [I] NVTX verbosity: 0
+[06/18/2026-21:18:55] [I] Persistent Cache Ratio: 0
+[06/18/2026-21:18:55] [I] Optimization Profile Index: 0
+[06/18/2026-21:18:55] [I] Weight Streaming Budget: 100.000000%
+[06/18/2026-21:18:55] [I] Accuracy Algorithm: L0
+[06/18/2026-21:18:55] [I] Absolute Tolerance (atol): 1e-05
+[06/18/2026-21:18:55] [I] Relative Tolerance (rtol): 1e-05
+[06/18/2026-21:18:55] [I] Inputs:
+[06/18/2026-21:18:55] [I] Debug Tensor Save Destinations:
+[06/18/2026-21:18:55] [I] Dump All Debug Tensor in Formats: 
+[06/18/2026-21:18:55] [I] === Reporting Options ===
+[06/18/2026-21:18:55] [I] Verbose: Enabled
+[06/18/2026-21:18:55] [I] Averages: 10 inferences
+[06/18/2026-21:18:55] [I] Percentiles: 90,95,99
+[06/18/2026-21:18:55] [I] Dump refittable layers:Disabled
+[06/18/2026-21:18:55] [I] Dump output: Disabled
+[06/18/2026-21:18:55] [I] Profile: Disabled
+[06/18/2026-21:18:55] [I] Export timing to JSON file: 
+[06/18/2026-21:18:55] [I] Export output to JSON file: 
+[06/18/2026-21:18:55] [I] Export profile to JSON file: 
+[06/18/2026-21:18:55] [I] 
+[06/18/2026-21:18:55] [I] === Device Information ===
+[06/18/2026-21:18:55] [I] Available Devices: 
+[06/18/2026-21:18:55] [I]   Device 0: "NVIDIA GeForce RTX 3080" UUID: GPU-9385c02a-6729-191b-6b9c-c967e1399fa2
+[06/18/2026-21:18:55] [I] Selected Device: NVIDIA GeForce RTX 3080
+[06/18/2026-21:18:55] [I] Selected Device ID: 0
+[06/18/2026-21:18:55] [I] Selected Device UUID: GPU-9385c02a-6729-191b-6b9c-c967e1399fa2
+[06/18/2026-21:18:55] [I] Compute Capability: 8.6
+[06/18/2026-21:18:55] [I] SMs: 70
+[06/18/2026-21:18:55] [I] Device Global Memory: 11908 MiB
+[06/18/2026-21:18:55] [I] Shared Memory per SM: 100 KiB
+[06/18/2026-21:18:55] [I] Memory Bus Width: 384 bits (ECC disabled)
+[06/18/2026-21:18:55] [I] Application Compute Clock Rate: 1.8 GHz
+[06/18/2026-21:18:55] [I] Application Memory Clock Rate: 9.501 GHz
+[06/18/2026-21:18:55] [I] 
+[06/18/2026-21:18:55] [I] Note: The application clock rates do not reflect the actual clock rates that the GPU is currently running at.
+[06/18/2026-21:18:55] [I] 
+[06/18/2026-21:18:55] [I] TensorRT version: 11.1.0
+[06/18/2026-21:18:55] [I] Loading standard plugins
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ROIAlign_TRT version 2
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::CropAndResizeDynamic version 2
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::InstanceNormalization_TRT version 3
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ScatterElements version 2
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::MultiscaleDeformableAttnPlugin_TRT version 2
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ModulatedDeformConv2d version 2
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::DecodeBbox3DPlugin version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::DetectionLayer_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::EfficientNMS_Explicit_TF_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::EfficientNMS_Implicit_TF_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::EfficientNMS_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::FlattenConcat_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::GenerateDetection_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::GridAnchor_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::GridAnchorRect_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::InstanceNormalization_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::InstanceNormalization_TRT version 2
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ModulatedDeformConv2d version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::MultilevelCropAndResize_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::MultilevelProposeROI_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::MultiscaleDeformableAttnPlugin_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::PillarScatterPlugin version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::PriorBox_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ProposalLayer_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::PyramidROIAlign_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::Region_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::Reorg_TRT version 2
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::Reorg_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ResizeNearest_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ROIAlign_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::RPROI_TRT version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ScatterElements version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::ScatterND version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::TopkLastDim version 1
+[06/18/2026-21:18:55] [V] [TRT] Registered plugin creator - ::VoxelGeneratorPlugin version 1
+&&&& FAILED TensorRT.trtexec [TensorRT v110100] [b106] # /bin/trtexec --loadEngine=model/trt_engines/apisr_fp16.trt --verbose
