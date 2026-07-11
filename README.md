@@ -6,6 +6,10 @@ Built on DeepStream 9.0 / GStreamer for the media pipeline, with a custom `nvdsv
 
 Tested on Ubuntu 24.04 with an RTX 3080 (12GB). Runs at 65-80 FPS on 720×480 anime content with the 2x BSConv model — well above the 30fps needed for real-time playback.
 
+## Demo
+
+![](demos/gintama_demo.mov)
+
 
 ## Project structure
 
