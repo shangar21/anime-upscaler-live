@@ -6,6 +6,9 @@ Built on DeepStream 9.0 / GStreamer for the media pipeline, with a custom `nvdsv
 
 Tested on Ubuntu 24.04 with an RTX 3080 (12GB). Runs at 65-80 FPS on 720×480 anime content with the 2x model — well above the 30fps needed for real-time playback.
 
+<img width="1916" height="686" alt="live_upscaler drawio(1)" src="https://github.com/user-attachments/assets/b4215d53-957a-414d-8d32-837ae03a9a30" />
+
+
 ## Demo
 
 
