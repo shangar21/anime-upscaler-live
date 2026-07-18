@@ -4,11 +4,14 @@ Real-time GPU-resident anime video upscaler. Decodes a video file, upscales ever
 
 Built on DeepStream 9.0 / GStreamer for the media pipeline, with a custom `nvdsvideotemplate` plugin that runs a TensorRT engine for the actual SR inference, and a GTK file-picker GUI for playback.
 
-Tested on Ubuntu 24.04 with an RTX 3080 (12GB). Runs at 65-80 FPS on 720×480 anime content with the 2x BSConv model — well above the 30fps needed for real-time playback.
+Tested on Ubuntu 24.04 with an RTX 3080 (12GB). Runs at 65-80 FPS on 720×480 anime content with the 2x model — well above the 30fps needed for real-time playback.
 
 ## Demo
 
-![](player/demos/gintama_demo.mov)
+
+
+https://github.com/user-attachments/assets/9c983ae0-6e14-4ec8-93cc-3d9f13eef664
+
 
 
 ## Project structure
@@ -22,15 +25,13 @@ Tested on Ubuntu 24.04 with an RTX 3080 (12GB). Runs at 65-80 FPS on 720×480 an
 │   ├── quant.py              # TRT engine builder + ORT/TRT benchmark suite
 │   └── trt_engines/          # Built .trt engine files (not checked in)
 │
-├── plugin/
+├── player/
 │   ├── customlib_impl.cpp    # nvdsvideotemplate custom library (the DeepStream plugin)
 │   ├── sr_trt_engine.hpp/cpp # TRT engine loader with runtime scale detection
 │   ├── sr_pipeline.hpp/cpp   # Per-frame tiling + cosine-blend pipeline
 │   ├── tile_kernels.cuh/cu   # Batch tile extraction + stitch CUDA kernels
 │   ├── pack_rgba_kernel.cuh/cu  # RGB planes → RGBA interleave kernel
 │   └── Makefile              # Builds libcustom_videoimpl.so
-│
-├── player/
 │   └── player.py             # GTK GUI: file picker, seek bar, audio, upscaled playback
 │
 ├── .gitignore
