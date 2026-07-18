@@ -247,9 +247,9 @@ void SrPipeline::processFrame(
             dstPlanes[c], outW, roiOut, NPP_RND_NEAR, nppCtx_));
     }
 		// --- DEBUG: Draw a solid Red stripe across the top 100 rows ---
-    cudaMemsetAsync(outPlaneR_, 255, 100 * outW * sizeof(Npp8u), stream);
-    cudaMemsetAsync(outPlaneG_, 0,   100 * outW * sizeof(Npp8u), stream);
-    cudaMemsetAsync(outPlaneB_, 0,   100 * outW * sizeof(Npp8u), stream);
+    //cudaMemsetAsync(outPlaneR_, 255, 100 * outW * sizeof(Npp8u), stream);
+    //cudaMemsetAsync(outPlaneG_, 0,   100 * outW * sizeof(Npp8u), stream);
+    //cudaMemsetAsync(outPlaneB_, 0,   100 * outW * sizeof(Npp8u), stream);
 
     launchPackRgbFromPlanes(outPlaneR_, outPlaneG_, outPlaneB_,
                              outRgba, outPitch, outW, outH, stream);
