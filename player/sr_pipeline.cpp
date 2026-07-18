@@ -144,6 +144,7 @@ void SrPipeline::processFrame(
             (const Npp8u *)inRgba, inPitch, planes4, width, roiFull, nppCtx_));
     }
     const Npp8u *srcPlanes[3] = { inPlaneR_, inPlaneG_, inPlaneB_ };
+		//const Npp8u *srcPlanes[3] = { inPlaneB_, inPlaneG_, inPlaneR_ };
     for (int c = 0; c < 3; ++c) {
         Npp32f *dst = frame_planar_ + size_t(c) * width * height;
         NPPCHECK(nppiConvert_8u32f_C1R_Ctx(
@@ -245,6 +246,11 @@ void SrPipeline::processFrame(
             accumPlanes[c], outW * sizeof(Npp32f),
             dstPlanes[c], outW, roiOut, NPP_RND_NEAR, nppCtx_));
     }
+		// --- DEBUG: Draw a solid Red stripe across the top 100 rows ---
+    cudaMemsetAsync(outPlaneR_, 255, 100 * outW * sizeof(Npp8u), stream);
+    cudaMemsetAsync(outPlaneG_, 0,   100 * outW * sizeof(Npp8u), stream);
+    cudaMemsetAsync(outPlaneB_, 0,   100 * outW * sizeof(Npp8u), stream);
+
     launchPackRgbFromPlanes(outPlaneR_, outPlaneG_, outPlaneB_,
                              outRgba, outPitch, outW, outH, stream);
 }
