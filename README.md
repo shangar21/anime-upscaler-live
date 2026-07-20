@@ -6,8 +6,7 @@ The software uses DeepStream 9.0 and GStreamer for the media pipeline. A custom 
 
 We tested this software on Ubuntu 24.04 with an RTX 3080 (12GB) GPU. It operates at 30 frames per second (FPS) on 720×480 anime video with the 2x model.  
 
-<img width="1916" height="686" alt="live_upscaler drawio(1)" src="https://github.com/user-attachments/assets/b4215d53-957a-414d-8d32-837ae03a9a30" />
-
+<img width="1916" height="700" alt="live_upscaler drawio(2)" src="https://github.com/user-attachments/assets/939b301e-97a5-4067-93e0-e96a1f520e6a" />
 
 ## Demo
 
