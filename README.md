@@ -1,10 +1,10 @@
 # Anime Super-Resolution Video Player
 
-Real-time GPU-resident anime video upscaler. Decodes a video file, upscales every frame through a trained super-resolution model running on TensorRT, and displays the result — all on-GPU with zero CPU-GPU memory copies in the processing path.
+This software is a real-time anime video upscaler that operates on the GPU. It decodes a video file, increases the resolution of every frame, and shows the result. It uses a trained super-resolution model that operates on TensorRT. All processing occurs on the GPU. The software does not copy memory between the CPU and the GPU.  
 
-Built on DeepStream 9.0 / GStreamer for the media pipeline, with a custom `nvdsvideotemplate` plugin that runs a TensorRT engine for the actual SR inference, and a GTK file-picker GUI for playback.
+The software uses DeepStream 9.0 and GStreamer for the media pipeline. A custom nvdsvideotemplate plugin operates the TensorRT engine for inference. The graphical user interface (GUI) uses GTK to let you select files and play video.  
 
-Tested on Ubuntu 24.04 with an RTX 3080 (12GB). Runs at 30 FPS on 720×480 anime content with the 2x model.
+We tested this software on Ubuntu 24.04 with an RTX 3080 (12GB) GPU. It operates at 30 frames per second (FPS) on 720×480 anime video with the 2x model.  
 
 <img width="1916" height="686" alt="live_upscaler drawio(1)" src="https://github.com/user-attachments/assets/b4215d53-957a-414d-8d32-837ae03a9a30" />
 
@@ -22,20 +22,20 @@ https://github.com/user-attachments/assets/9c983ae0-6e14-4ec8-93cc-3d9f13eef664
 ```
 .
 ├── model/
-│   ├── apisr.py              # Model architectures (4 variants)
-│   ├── train.py              # Training loop, ONNX export, evaluation
-│   ├── dataset.py            # Patch-based SR dataset with augmentation
-│   ├── quant.py              # TRT engine builder + ORT/TRT benchmark suite
-│   └── trt_engines/          # Built .trt engine files (not checked in)
+│   ├── apisr.py              # Contains four model architectures
+│   ├── train.py              # Controls the training loop, ONNX export, and evaluation
+│   ├── dataset.py            # Creates the dataset and applies augmentation
+│   ├── quant.py              # Builds the TensorRT engine and runs benchmarks
+│   └── trt_engines/          # Contains the compiled .trt engine files
 │
 ├── player/
-│   ├── customlib_impl.cpp    # nvdsvideotemplate custom library (the DeepStream plugin)
-│   ├── sr_trt_engine.hpp/cpp # TRT engine loader with runtime scale detection
-│   ├── sr_pipeline.hpp/cpp   # Per-frame tiling + cosine-blend pipeline
-│   ├── tile_kernels.cuh/cu   # Batch tile extraction + stitch CUDA kernels
-│   ├── pack_rgba_kernel.cuh/cu  # RGB planes → RGBA interleave kernel
-│   └── Makefile              # Builds libcustom_videoimpl.so
-│   └── player.py             # GTK GUI: file picker, seek bar, audio, upscaled playback
+│   ├── customlib_impl.cpp    # Contains the custom DeepStream plugin
+│   ├── sr_trt_engine.hpp/cpp # Loads the TensorRT engine and detects the scale
+│   ├── sr_pipeline.hpp/cpp   # Controls the tiling and blend pipeline
+│   ├── tile_kernels.cuh/cu   # Contains CUDA kernels to extract and stitch tiles
+│   ├── pack_rgba_kernel.cuh/cu  # Contains CUDA kernels to combine RGB planes into RGBA
+│   └── Makefile              # Compiles libcustom_videoimpl.so
+│   └── player.py             # Contains the GTK GUI
 │
 ├── .gitignore
 └── README.md
@@ -46,7 +46,7 @@ https://github.com/user-attachments/assets/9c983ae0-6e14-4ec8-93cc-3d9f13eef664
 
 ### The model
 
-APISR is a single-image super-resolution network trained specifically on anime content. It takes a low-resolution RGB patch (e.g. 64×64) and outputs a high-resolution version (128×128 at 2x, or 256×256 at 4x). The architecture is a standard residual network with a PixelShuffle upsampler, available in four variants trading quality against speed:
+APISR is a neural network. It increases the resolution of a single image. We trained it on anime video. It receives a low-resolution RGB image area, such as 64×64 pixels. It outputs a high-resolution image area. The output is 128×128 pixels for 2x scale, or 256×256 pixels for 4x scale. The model is a residual network that uses a PixelShuffle upsampler. There are four versions of the model. These versions balance visual quality and processing speed:
 
 | Variant | Tag | Params | Block type | Expected speed (720p, TRT FP16) |
 |---------|-----|--------|------------|-------------------------------|
@@ -55,15 +55,17 @@ APISR is a single-image super-resolution network trained specifically on anime c
 | `BSConvAPISR` | `bsconv` | ~0.4M | Blueprint Separable Conv | ~50-80 FPS |
 | `FastAPISR` | `fast` | ~0.2M | Channel-split depthwise | ~80-120 FPS |
 
-All variants share the same head→residual body→PixelShuffle upsample→clamp structure. The scale factor (2x or 4x) is a constructor argument and controls the upsample stage: 4x uses two cascaded 2x PixelShuffles to avoid checkerboard artifacts on anime line art; 2x uses a single stage.
+All model versions use the same structure: head, residual body, PixelShuffle upsample, and clamp. The scale factor (2x or 4x) controls the upsample stage. The 4x scale uses two 2x PixelShuffle stages. This prevents checkerboard artifacts on anime line art. The 2x scale uses one stage.  
+
+The model requires NCHW float32 input. The values must be between [0, 1]. Do not use mean or standard deviation normalization. The forward() function limits the output to [0, 1].  
 
 Model I/O contract: NCHW float32, values in `[0, 1]`, no mean/std normalization. Output is clamped to `[0, 1]` by the model's own `forward()`.
 
 ### Training
 
-The loss function (`TwinPerceptualLoss`) uses a warmup schedule: pure L1 for the first N epochs (sharp edges first), then gradually ramps in a VGG19+ResNet18 perceptual loss (texture quality). This two-phase approach avoids the blurriness that perceptual loss causes when applied from the start.
+The loss function (TwinPerceptualLoss) uses a two-phase procedure. First, it uses L1 loss for the initial epochs to make sharp edges. Second, it adds a VGG19 and ResNet18 perceptual loss to improve texture quality. This procedure prevents blurry images.  
 
-The dataset (`SRDataset`) randomly crops HR patches from your image directory, applies spatial augmentations (flip, rotate) and mild color jitter, then downsamples to LR using Lanczos — producing (LR, HR) training pairs on the fly.
+The dataset (SRDataset) cuts high-resolution areas from your images. It changes the spatial orientation and colors. Then, it decreases the resolution with a Lanczos filter. This creates pairs of low-resolution and high-resolution images for training.  
 
 ### The DeepStream pipeline
 
@@ -76,35 +78,23 @@ filesrc → parsebin → nvv4l2decoder (NVDEC) → nvstreammux
 → nvvideoconvert → nv3dsink
 ```
 
-Key design decisions, each driven by a real bug encountered during development:
-
-**`parsebin` instead of `decodebin`**: `decodebin`'s autoplugger fails to negotiate NVDEC for 10-bit HEVC (Main10 profile) even though the explicit `demux → parse → nvv4l2decoder` chain works perfectly. `parsebin` handles demuxing and bitstream parsing without trying to autopick the final decoder, letting us wire `nvv4l2decoder` in ourselves.
-
-**Explicit NVMM caps filter**: Without `video/x-raw(memory:NVMM),format=RGBA` between `nvvideoconvert` and `nvdsvideotemplate`, the converter silently drops the `memory:NVMM` caps feature. The plugin then receives plain system-memory buffers instead of `NvBufSurface` pointers, and casting raw pixel bytes to the `NvBufSurface` struct produces garbage fields that cause an immediate SIGSEGV. Confirmed via `gst-launch -v` caps tracing.
-
-**Synchronous `ProcessBuffer`** (no `OutputThread`): The async queue + background thread pattern from NVIDIA's reference implementation causes a deadlock with real video decoders. The streaming thread blocks inside `nvv4l2decoder` waiting for a V4L2 capture buffer to be returned, while `OutputThread` blocks inside `gst_pad_push` waiting for the streaming thread to process serialized events. Four frames process successfully (matching the decoder's internal capture buffer count), then everything freezes. Processing synchronously on the streaming thread avoids this entirely, and at 8-15ms/frame is easily fast enough for real-time 30fps.
-
-**Engine pre-load in `SetProperty`**: `GetCompatibleCaps` fires during caps negotiation, before `SetInitParams` loads the engine. If the scale factor defaults to 1 at that point, the output buffer pool gets allocated at input resolution — the subsequent upscaled output then writes past the end of the buffer. Loading the engine in `SetProperty` (when `engine-path` is set) ensures `m_scaleFactor` is correct before negotiation happens.
-
-**First-audio-only gating**: Files with multiple audio tracks (common in dual-audio anime rips) create multiple `autoaudiosink` instances that compete for the PulseAudio clock, producing ever-growing clock skew that stalls the pipeline. Only the first audio track is routed to a real sink; additional tracks drain to `fakesink`.
+These are the primary design decisions:  
+- parsebin instead of decodebin: The decodebin function cannot use NVDEC for 10-bit HEVC video. The parsebin function separates the video stream. It lets us connect nvv4l2decoder manually.
+- Explicit NVMM caps filter: You must put video/x-raw(memory:NVMM),format=RGBA between nvvideoconvert and nvdsvideotemplate. If you do not, the converter removes the memory:NVMM property. The plugin will then receive system-memory buffers instead of NvBufSurface pointers. This causes a SIGSEGV error.
+- Synchronous ProcessBuffer: Do not use an asynchronous queue and background thread. This causes a deadlock error with video decoders. Synchronous processing on the streaming thread prevents this error. It requires 8 to 15 milliseconds per frame. This is sufficiently fast for 30 FPS video.
+- Engine pre-load in SetProperty: You must load the engine in SetProperty when you set engine-path. This makes sure m_scaleFactor is correct before the software allocates the output buffer. If the scale factor is incorrect, the output writes to invalid memory.
+- First-audio-only gating: Videos with multiple audio tracks cause synchronization errors. The software sends only the first audio track to the output. It sends the other tracks to fakesink
 
 ### The custom plugin
-
-The plugin (`libcustom_videoimpl.so`) implements the `IDSCustomLibrary` interface from `nvdsvideotemplate`. Its `ProcessBuffer` method runs the full SR pipeline on each incoming frame:
-
-1. **RGBA → planar float32**: NPP `nppiCopy_8u_C4P4R` splits RGBA into 4 uint8 planes (alpha discarded), then `nppiConvert_8u32f` + `nppiMulC` normalize each channel to `[0, 1]`.
-
-2. **Tile extraction**: A custom CUDA kernel (`launchExtractTiles`) copies all tiles from the planar frame into the TRT engine's batched input buffer in one parallel launch — one thread per (tile, channel, row, column). This replaced an earlier per-tile NPP loop that issued ~700 individual kernel launches per frame.
-
-3. **TRT inference**: The engine runs all tiles in the batch. With 96 tiles at maxBatch=64, this is 2 calls per frame.
-
-4. **Cosine-blend stitch**: Another custom kernel (`launchStitchTiles`) accumulates all output tiles into the upscaled frame using `atomicAdd` with cosine-weighted blending, matching the `_make_blend_mask` function from `train.py`/`quant.py`. A separate weight accumulator tracks total blend weight per pixel.
-
-5. **Normalize + pack**: NPP divides the accumulator by the weight buffer, scales back to `[0, 255]`, converts to uint8, then a final custom kernel (`launchPackRgbFromPlanes`) interleaves the 3 uint8 channel planes into RGBA. This last kernel exists because no NPP function performs a "3 planes in, skip the 4th channel out" interleave — confirmed by grepping the real installed `npp.h` headers.
+The custom plugin (libcustom_videoimpl.so) uses the IDSCustomLibrary interface. The ProcessBuffer function operates the super-resolution pipeline on every frame:  
+1. RGBA to planar float32: The software separates RGBA data into 4 uint8 planes. It discards the alpha plane. It changes the data to float32 and scales it to [0, 1].
+2. Tile extraction: A custom CUDA kernel (launchExtractTiles) copies all tiles into the input buffer. This occurs in one parallel operation.
+3. TensorRT inference: The engine processes all tiles in the batch.  Cosine-blend stitch: A custom CUDA kernel (launchStitchTiles) puts the output tiles into the high-resolution frame. It uses cosine-weighted blending.
+4. Normalize and pack: The software normalizes the data and changes it to uint8. A custom CUDA kernel (launchPackRgbFromPlanes) combines the 3 uint8 planes into RGBA format. 
 
 ### Runtime scale detection
 
-The plugin reads the engine's optimization profile at load time to derive scale, tile sizes, and max batch — so swapping between a 2x and 4x engine requires no code changes or recompilation. The engine's input opt shape gives the LR tile size, `setInputShape` + `getTensorShape` on the output gives the HR tile size (since `getProfileShape` is input-only in TRT 10.x), and the ratio determines the scale. This is logged on startup:
+The plugin reads the engine profile when it loads. It finds the scale, tile sizes, and maximum batch size. You do not have to change the code or compile the software to change between 2x and 4x models. The software logs this data when it starts:  
 
 ```
 SrTrtEngine: loaded apisr_fp16.trt
@@ -126,7 +116,7 @@ SrTrtEngine: loaded apisr_fp16.trt
 
 ### TensorRT version pinning
 
-DeepStream 9.0 links against TensorRT 10.16, but NVIDIA's apt repo defaults to installing the latest TRT (11.x). If left unpinned, `libnvinfer-dev`, `libnvinfer-bin`, and related packages drift to 11.x, causing serialization mismatches when loading engines. Pin them:
+DeepStream 9.0 requires TensorRT 10.16. The default NVIDIA repository installs TensorRT 11.x. You must pin the TensorRT packages to version 10.16. If you do not, the engine files will not load. Use these commands:
 
 ```bash
 sudo apt install \
@@ -151,7 +141,7 @@ source venv/bin/activate
 pip install torch torchvision onnx onnxruntime-gpu numpy pillow tqdm tensorrt
 ```
 
-**Important**: The venv's `tensorrt` package version will almost certainly differ from the system TRT that DeepStream uses. This is fine for training, ONNX export, and Python-side benchmarking — but **never use `python quant.py export` to build engines the C++ plugin will load**. Always use the system `trtexec` binary for engine builds (see below). Deactivate the venv before building engines or running the player.
+Important: The TensorRT version in the virtual environment is different from the system version. This is acceptable for training. Do not use python quant.py export to build the engine files for the C++ plugin. You must use the system trtexec file. Deactivate the virtual environment before you build engines or operate the player.
 
 ### System dependencies (player)
 
