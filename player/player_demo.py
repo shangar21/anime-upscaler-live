@@ -214,7 +214,8 @@ class PlayerWindow(Gtk.Window):
 
         # Link original branch
         upstream = queue_orig
-        for el in [postconv_orig, capsfilter_orig, sink_orig]:
+        #for el in [postconv_orig, capsfilter_orig, sink_orig]:
+        for el in [postconv_orig, sink_orig]:
             if not upstream.link(el):
                 print(f"Warning: could not link {upstream.get_name()} -> {el.get_name()}")
             upstream = el

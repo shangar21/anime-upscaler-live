@@ -38,7 +38,7 @@ ENGINE_PATH = "/home/shangar21/Documents/upscaler/model/trt_engines/apisr_fp16.t
 # HR-pixel overlap between adjacent tiles. Default (16) matches quant.py's
 # bench default. Reduce to 8 for fewer tiles/frame and better GPU utilization
 # if seams aren't visible; increase if you see seam artifacts.
-OVERLAP_HR = 16
+OVERLAP_HR = 2 
 
 # Set True to drop all audio (diagnostic: isolates whether the audio clock is
 # causing the pipeline stall vs. a video-path issue). If video plays through
